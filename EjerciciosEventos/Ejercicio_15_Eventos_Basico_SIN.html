@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Ejercicio 15 - Base Inicial</title>
+    <style type="text/css">
+        body {
+            font-family: arial, helvetica;
+        }
+        #info {
+            width: 160px;
+            border: thin solid silver;
+            padding: .5em;
+            position: fixed;
+            background-color: #fcfcfc;
+        }
+        #info h1 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+    </style>
+    <script type="text/javascript">
+
+        // TU CÓDIGO JAVASCRIPT DEBE IR AQUÍ
+        // Pista: Debes asignar las funciones controladoras a document o window
+        // ejemplo: document.onmousemove = tuFuncion;
+
+        window.onload = function () {
+
+            const cajaCoordenadas = document.getElementById('info');
+
+            document.addEventListener('mousemove', function(evento) {
+
+                let x = evento.clientX;
+                let y = evento.clientY;
+
+                cajaCoordenadas.style.backgroundColor = "000000";
+                cajaCoordenadas.innerHTML = ` <h1>RATÓN</h1>Posición de X: ${x} Posición de Y: ${y}`;
+
+            });
+
+            document.addEventListener('keypress', function (evento) {
+
+                let char = evento.key;
+                let code = evento.keyCode;
+
+                cajaCoordenadas.innerHTML = ` <h1>TECLADO</h1>Letra: ${char}<br> Código: ${code}`;
+
+            });
+
+            document.addEventListener('keydown', function (evento) {
+                cajaCoordenadas.style.backgroundColor = "#cce6ff";
+            });
+
+            document.addEventListener('mousedown', function (evento) {
+                cajaCoordenadas.style.backgroundColor = "#ffffcc";
+            });
+
+            document.addEventListener('mouseup', function (evento) {
+                cajaCoordenadas.style.backgroundColor = "#000000";
+            });
+        }
+
+    </script>
+</head>
+<body>
+<div id="info">
+    <h1>Información</h1>
+    <p>Mueve el ratón o pulsa una tecla para ver los detalles del evento.</p>
+</div>
+
+<div style="height: 1000px;"></div> <!-- Espacio para poder hacer scroll y probar pageX/pageY -->
+</body>
+</html>
