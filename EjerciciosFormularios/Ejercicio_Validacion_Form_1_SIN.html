@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<title>Validar Formularios - Ejercicio 1</title>
+	<style type="text/css">
+		span {
+			color: red;
+		}
+	</style>
+	<script src="Utilidades.js"></script>
+	<script>
+
+		function limpiarErrores() {
+			document.getElementById('info_nombre').textContent = '';
+			document.getElementById('info_apellidos').textContent = '';
+			document.getElementById('info_dni').textContent = '';
+			document.getElementById('info_sexo').textContent = '';
+			document.getElementById('info_fecha').textContent = '';
+			document.getElementById('info_sugerencia').textContent = '';
+		}
+
+		function validarFormulario() {
+			let esValido = true;
+			limpiarErrores();
+
+			// 1. Validar Nombre
+			const nombre = document.getElementById('nombre').value;
+			const resNombre = validarTexto(nombre, 2);
+			if (!resNombre.valido) {
+				document.getElementById('info_nombre').textContent = resNombre.msj;
+				esValido = false;
+			}
+
+			// 2. Validar Apellidos
+			const apellidos = document.getElementById('apellidos').value;
+			const resApellidos = validarTexto(apellidos, 4);
+			if (!resApellidos.valido) {
+				document.getElementById('info_apellidos').textContent = resApellidos.msj;
+				esValido = false;
+			}
+
+			// 3. Validar DNI
+			const dni = document.getElementById('dni').value;
+			const resDni = validarDNI(dni);
+			if (!resDni.valido) {
+				document.getElementById('info_dni').textContent = resDni.msj;
+				esValido = false;
+			}
+
+			// 4. Validar Sexo
+			const sexo = document.getElementById('sexo').value;
+			if (sexo === "") {
+				document.getElementById('info_sexo').textContent = "Debes seleccionar una opción.";
+				esValido = false;
+			}
+
+			// 5. Validar Fecha
+			const dia = document.getElementById('f_dia').value;
+			const mes = document.getElementById('f_mes').value;
+			const ano = document.getElementById('f_ano').value;
+			const resFecha = validarFecha(dia, mes, ano);
+			if (!resFecha.valido) {
+				document.getElementById('info_fecha').textContent = resFecha.msj;
+				esValido = false;
+			}
+
+			// 6. Validar Sugerencia
+			const sugerencia = document.getElementById('sugerencia').value;
+			const resSugerencia = validarSugerencia(sugerencia);
+			if (!resSugerencia.valido) {
+				document.getElementById('info_sugerencia').textContent = resSugerencia.msj;
+				esValido = false;
+			}
+
+			return esValido;
+		}
+
+		window.onload = function () {
+
+			document.getElementById('nombre').focus();
+
+			const form = document.getElementById('formulario_1');
+
+			form.onsubmit = function () {
+				return validarFormulario();
+			};
+
+			form.onreset = function () {
+				limpiarErrores();
+				setTimeout(() => document.getElementById('nombre').focus(), 0);
+			};
+		};
+
+	</script>
+</head>
+
+<body>
+
+<h1>Ejercicio Validación de Formularios</h1>
+<form id="formulario_1">
+	<p>
+	<h3>Formulario de Registro:</h3>
+	<label for="nombre">Nombre: </label>
+	<input type="text" name="nombre" id="nombre" maxlength="25" size="15" />
+	<span id="info_nombre"></span>
+	<div>(Mínimo 2 letras)</div>
+	<br><br>
+
+	<label for="apellidos">Apellidos: </label>
+	<input type="text" name="apellidos" id="apellidos" maxlength="50" size="25" />
+	<span id="info_apellidos"></span>
+	<div>(Mínimo 4 letras)</div>
+	<br><br>
+
+	<label for="dni">NIF: </label>
+	<input type="text" name="dni" id="dni" maxlength="9" size="9" />
+	<span id="info_dni"></span>
+	<br><br><br>
+
+	<label for="sexo">Sexo: </label>
+	<select id="sexo">
+		<option value="">Selecciona una opción</option>
+		<option value="F">Femenino</option>
+		<option value="M">Masculino</option>
+		<option value="Y">Ya quisiera yo</option>
+	</select>
+	<span id="info_sexo"></span>
+	<br><br><br>
+
+	<label for="f_dia">Fecha: </label>
+	<input type="text" id="f_dia" maxlength="2" size="1" /> /
+	<input type="text" id="f_mes" maxlength="2" size="1" /> /
+	<input type="text" id="f_ano" maxlength="4" size="3" /> (dd/mm/aaaa)
+	<span id="info_fecha"></span>
+	<br><br><br>
+
+	<label for="sugerencia">Alguna sugerencia: </label>
+	<textarea id="sugerencia" name="sugerencia"></textarea>
+	<span id="info_sugerencia"></span>
+	<br><br>
+	</p>
+	<p><b>Todos los campos son obligatorios.</b></p>
+	<br>
+	<p>
+		<input type="submit" value="ENVIAR" >
+		<br><br>
+		<input type="reset" value="Limpiar">
+	</p>
+</form>
+</body>
+</html>
