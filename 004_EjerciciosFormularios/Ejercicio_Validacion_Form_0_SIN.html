@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8"/>
+	<title>Validar Formularios</title>
+	<style type="text/css">
+		span {
+			color: red;
+		}
+	</style>
+	<script src="Utilidades.js"></script>
+	<script>
+
+		function limpiarErrores() {
+			document.getElementById('info_nombre').textContent = '';
+			document.getElementById('info_dni').textContent = '';
+			document.getElementById('info_sexo').textContent = '';
+			document.getElementById('info_sugerencia').textContent = '';
+		}
+
+		function validarFormulario() {
+			let esValido = true;
+			limpiarErrores();
+
+			// 1. Validar nombre
+			const nombre = document.getElementById('nombre').value;
+			const nombreValido = validarTexto(nombre, 2);
+			if (!nombreValido.valido) {
+				document.getElementById('info_nombre').textContent = nombreValido.msj;
+				esValido = false;
+			}
+
+			// 2. Validar DNI
+			const DNI = document.getElementById('dni').value;
+			const DNIValido = validarDNI(DNI);
+			if (!DNIValido.valido) {
+				document.getElementById('info_dni').textContent = DNIValido.msj;
+				esValido = false;
+			}
+
+			// 3. Validar Sexo
+			const sexo = document.getElementById('sexo').value;
+			if (sexo === "") {
+				document.getElementById('info_sexo').textContent = "Debes seleccionar una opción.";
+				esValido = false;
+			}
+
+			// 4. Validar Sugerencia
+			const sugerencia = document.getElementById('sugerencia').value;
+			const sugerenciaValida = validarSugerencia(sugerencia);
+			if (!sugerenciaValida.valido) {
+				document.getElementById('info_sugerencia').textContent = sugerenciaValida.msj;
+				esValido = false;
+			}
+
+			return esValido;
+		}
+
+		window.onload = function () {
+
+			document.getElementById('nombre').focus();
+
+			const form = document.getElementById('formulario_1');
+
+			form.onsubmit = function () {
+				return validarFormulario();
+			};
+
+			form.onreset = function () {
+				limpiarErrores();
+				setTimeout(() => document.getElementById('nombre').focus(), 0);
+			};
+		};
+
+	</script>
+</head>
+
+<body>
+
+<h1>Ejercicio Validación de Formularios</h1>
+<form id="formulario_1">
+	<p>
+	<h3>Formulario de Registro:</h3>
+	<label for="nombre">Nombre: </label>
+	<input type="text" name="nombre" id="nombre" maxlength="25" size="15" />
+	<span id="info_nombre"></span>
+	<div>(Mínimo 2 letras)</div>
+	<br><br>
+
+	<label for="dni">NIF: </label>
+	<input type="text" name="dni" id="dni" maxlength="9" size="9" />
+	<span id="info_dni"></span>
+	<br><br><br>
+
+	<label for="sexo">Sexo: </label>
+	<select id="sexo">
+		<option value="">Selecciona una opción</option>
+		<option value="F">Femenino</option>
+		<option value="M">Masculino</option>
+		<option value="Y">Ya quisiera yo</option>
+	</select>
+	<span id="info_sexo"></span>
+
+	<br><br><br>
+	<label for="sugerencia">Alguna sugerencia: </label>
+	<textarea id="sugerencia" name="sugerencia"></textarea>
+	<span id="info_sugerencia"></span>
+	<br><br>
+	</p>
+	<p><b>Todos los campos son obligatorios.</b></p>
+	<br>
+	<p>
+		<input type="submit" value="ENVIAR" >
+		<br><br>
+		<input type="reset" value="Limpiar">
+	</p>
+</form>
+</body>
+</html>
