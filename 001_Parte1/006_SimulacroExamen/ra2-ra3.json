@@ -1,0 +1,81 @@
+{
+  "modulo": "Desarrollo Web en Entorno Cliente",
+  "resultados_de_aprendizaje": [
+    {
+      "codigo": "RA2",
+      "titulo": "Escribe sentencias simples, aplicando la sintaxis del lenguaje y verificando su ejecución sobre navegadores Web.",
+      "criterios_de_evaluacion": [
+        {
+          "codigo": "a",
+          "descripcion": "Se ha seleccionado un lenguaje de programación de clientes Web en función de sus posibilidades."
+        },
+        {
+          "codigo": "b",
+          "descripcion": "Se han utilizado los distintos tipos de variables y operadores disponibles en el lenguaje."
+        },
+        {
+          "codigo": "c",
+          "descripcion": "Se han identificado los ámbitos de utilización de las variables."
+        },
+        {
+          "codigo": "d",
+          "descripcion": "Se han reconocido y comprobado las peculiaridades del lenguaje respecto a las conversiones entre distintos tipos de datos."
+        },
+        {
+          "codigo": "e",
+          "descripcion": "Se han añadido comentarios al código."
+        },
+        {
+          "codigo": "f",
+          "descripcion": "Se han utilizado mecanismos de decisión en la creación de bloques de sentencias."
+        },
+        {
+          "codigo": "g",
+          "descripcion": "Se han utilizado bucles y se ha verificado su funcionamiento."
+        },
+        {
+          "codigo": "h",
+          "descripcion": "Se han utilizado herramientas y entornos para facilitar la programación, prueba y depuración del código."
+        }
+      ]
+    },
+    {
+      "codigo": "RA3",
+      "titulo": "Escribe código, identificando y aplicando las funcionalidades aportadas por los objetos predefinidos del lenguaje.",
+      "criterios_de_evaluacion": [
+        {
+          "codigo": "a",
+          "descripcion": "Se han identificado los objetos predefinidos del lenguaje."
+        },
+        {
+          "codigo": "b",
+          "descripcion": "Se han analizado los objetos referentes a las ventanas del navegador y los documentos Web que contienen."
+        },
+        {
+          "codigo": "c",
+          "descripcion": "Se han escrito sentencias que utilicen los objetos predefinidos del lenguaje para cambiar el aspecto del navegador y el documento que contiene."
+        },
+        {
+          "codigo": "d",
+          "descripcion": "Se han generado textos y etiquetas como resultado de la ejecución de código en el navegador."
+        },
+        {
+          "codigo": "e",
+          "descripcion": "Se han escrito sentencias que utilicen los objetos predefinidos del lenguaje para interactuar con el usuario."
+        },
+        {
+          "codigo": "f",
+          "descripcion": "Se han utilizado las características propias del lenguaje en documentos compuestos por varias ventanas y marcos."
+        },
+        {
+          "codigo": "g",
+          "descripcion": "Se han utilizado «cookies» para almacenar información y recuperar su contenido."
+        },
+        {
+          "codigo": "h",
+          "descripcion": "Se ha depurado y documentado el código."
+        }
+      ]
+    }
+  ]
+}
