@@ -84,16 +84,31 @@
 	//  Recuerda: en el constructor, super(...) va ANTES de usar this.
 	class Cilindro extends Circulo {
 		constructor(x = 0, y = 0, r = 0, h = 0) {
-			super(x, y, r);
 			if (x instanceof Cilindro) {
-				this.altura = x.h;
+				super(x.x, x.y, x.r);
+				this.altura = x.altura;
 			} else if (x instanceof Circulo) {
+				super(x.x, x.y, x.r);
 				this.altura = y;
 			} else if (x instanceof Punto) {
+				super(x.x, x.y, y);
 				this.altura = r;
 			} else {
+				super(x, y, r);
 				this.altura = h;
 			}
+		}
+
+		mostrar() {
+			return super.mostrar() + "Altura: " + this.altura;
+		}
+
+		area() {
+			return 2 * super.area() + super.longCircunferencia() * this.altura;
+		}
+
+		volumen() {
+			return super.area() * this.altura;
 		}
 	}
 

@@ -55,6 +55,20 @@
 	//     new Libro(nombre, precio, autor)
 	//     · iva()     → REDEFINIDO: 0.04
 	//     · mostrar() → REDEFINIDO: el del padre (super.mostrar()) + " · autor: ..."
+	class Libro extends Producto {
+		constructor(nombre, precio, autor) {
+			super(nombre, precio);
+			this.autor = autor;
+		}
+
+		iva() {
+			return 0.04;
+		}
+
+		mostrar() {
+			return super.mostrar() + " autor: " + this.autor;
+		}
+	}
 
 
 
@@ -62,6 +76,20 @@
 	//     new Alimento(nombre, precio, caducidad)
 	//     · iva()     → REDEFINIDO: 0.10
 	//     · mostrar() → REDEFINIDO: el del padre + " · caduca: ..."
+	class Alimento extends Producto {
+		constructor(nombre, precio, caducidad) {
+			super(nombre, precio);
+			this.caducidad = caducidad;
+		}
+
+		iva() {
+			return 0.1;
+		}
+
+		mostrar() {
+			return super.mostrar() + " caducidad: " + this.caducidad;
+		}
+	}
 
 
 
@@ -71,6 +99,36 @@
 	//     · total()                   → suma el precioFinal() de todos los productos
 	//     · mostrar()                 → "Carrito de Ana (ana@correo.es) (3 productos)",
 	//                                   una línea por producto y el TOTAL
+	class Carrito {
+		constructor(cliente) {
+			this.cliente = cliente;
+			this.productos = [];
+		}
+
+		agregar(producto) {
+			this.productos.push(producto);
+		}
+
+		total() {
+			let suma = 0;
+			for (const producto of this.productos) {
+				suma += producto.precioFinal();
+			}
+			return suma;
+		}
+
+		mostrar() {
+			let resultado = `Carrito de ${this.cliente.mostrar()} (${this.productos.length} productos)\n`;
+
+			for(let p of this.productos) {
+				resultado += ` - ${p.mostrar()}\n`;
+			}
+
+			resultado += `TOTAL: ${this.total().toFixed(2)} €`;
+
+			return resultado;
+		}
+	}
 
 
 

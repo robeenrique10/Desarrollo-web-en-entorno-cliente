@@ -160,179 +160,266 @@
   </template>
 
   <script>
+    /**
+     * FESTIVAL PRISMA - PANEL DE COORDINACIÓN
+     * Script integral de desarrollo web en entorno cliente.
+     */
+
+    // Aseguramos que todo el script se ejecuta únicamente cuando el DOM está completamente cargado (RA2.a)
     document.addEventListener("DOMContentLoaded", () => {
 
-      //Inputs de datos
-      const inputAsistencia = document.getElementById("asistencia");
-      const inputDuracion = document.getElementById("dias");
-      const inputAguaXPersona = document.getElementById("agua-persona");
-      const inputPresupuesto = document.getElementById("ajuste-caja");
-      const inputBidones = document.getElementById("bidones");
-      const inputMensajePublico = document.getElementById("mensaje-publico");
+      // ==========================================
+      // 1. CAPTURA DE ELEMENTOS DEL DOM Y VARIABLES GLOBALES
+      // ==========================================
 
-      //Botones
+      // Inputs de la sección de planificación
+      const inputAsistencia = document.getElementById("asistencia");
+      const inputDias = document.getElementById("dias");
+      const inputAguaPersona = document.getElementById("agua-persona");
+      const inputAjusteCaja = document.getElementById("ajuste-caja");
+      const inputBidones = document.getElementById("bidones");
+
+      // Botones de acción general
       const btnCalcularRecursos = document.getElementById("calcular-recursos");
       const btnPublicarInforme = document.getElementById("publicar-informe");
       const btnAnadirTurno = document.getElementById("anadir-turno");
-      const btnCambiarResumenTurno = document.getElementById("resumir-turnos");
+      const btnResumirTurnos = document.getElementById("resumir-turnos");
       const btnActualizarPantalla = document.getElementById("actualizar-pantalla");
 
-      //Output datos
-      const outputAguaNecesaria = document.getElementById("agua-total");
-      const outputBidonesNecesarios = document.getElementById("bidones-necesarios");
-      const outputPresupuestoEstimado = document.getElementById("presupuesto");
-      const outputEstado = document.getElementById("estado-recursos");
-      const outputListaTurnos = document.getElementById("sin-turnos");
-      const outputHorasTotales = document.getElementById("horas-totales");
-      const outputMediaTurno = document.getElementById("media-turno");
-      const outputTurnoMas8Horas = document.getElementById("turnos-extensos");
-      const outputInformacionPantalla = document.getElementById("datos-ventana");
+      // Elementos de salida (<output> y estados) de recursos
+      const outAguaTotal = document.getElementById("agua-total");
+      const outBidonesNecesarios = document.getElementById("bidones-necesarios");
+      const outPresupuesto = document.getElementById("presupuesto");
+      const statusEstadoRecursos = document.getElementById("estado-recursos");
 
-      //Plantilla Turnos
-      const plantillaTurnos = document.getElementById("plantilla-turno");
+      // Elementos de la gestión de turnos
+      const listaTurnos = document.getElementById("lista-turnos");
+      const pSinTurnos = document.getElementById("sin-turnos");
+      const plantillaTurno = document.getElementById("plantilla-turno");
+      const outHorasTotales = document.getElementById("horas-totales");
+      const outMediaTurno = document.getElementById("media-turno");
+      const outTurnosExtensos = document.getElementById("turnos-extensos");
 
-      //Validación de datos correctos en Planificación
-      const regexEnteroPosSinSigNiSeparadores = /^\d+$/;
-      const regexAguaPersonaDia = /^\d+(,\d+)?$/;
-      const regexPresupuesto = /^-?\d+(\.\d+)?$/;
+      // Elementos de la pantalla pública
+      const inputMensajePublico = document.getElementById("mensaje-publico");
+      const divPantallaPublica = document.getElementById("pantalla-publica");
+      const textoPublico = document.getElementById("texto-publico");
+      const datosVentana = document.getElementById("datos-ventana");
 
+      // Variable global temporal para almacenar el último cálculo de recursos válido
+      let ultimoCalculoValido = null;
+
+
+      // ==========================================
+      // 2. TAREA 1: VALIDACIÓN DE DATOS DE PLANIFICACIÓN
+      // ==========================================
+
+      // Expresiones regulares exigidas en el enunciado
+      const regexEnteroPositivo = /^\d+$/;             // Enteros positivos sin signo ni separadores
+      const regexAgua = /^\d+(,\d+)?$/;               // Número positivo, admite decimales con coma, sin punto ni signo
+      const regexPresupuesto = /^-?\d+(\.\d+)?$/;     // Número con punto decimal opcional, admite negativo, sin positivo ni coma
+
+      /**
+       * Función reutilizable para validar inputs en tiempo real (al escribir o pegar texto).
+       * @param {HTMLElement} input - Elemento input a validar.
+       * @param {RegExp} regex - Expresión regular que debe cumplir.
+       */
       function configurarValidacion(input, regex) {
         const validar = () => {
           const valor = input.value.trim();
+          // Si el campo está vacío, retiramos estilos de validación
           if (valor === "") {
-            input.style.borderColor = "#d5dde5";
+            input.classList.remove("valido", "invalido");
             return false;
           }
+          // Comprobamos si el valor cumple la expresión regular
           if (regex.test(valor)) {
-            input.style.borderColor = "#17633a";
+            input.classList.add("valido");
+            input.classList.remove("invalido");
             return true;
           } else {
-            input.style.borderColor = "#9d2525";
+            input.classList.add("invalido");
+            input.classList.remove("valido");
             return false;
           }
         };
+
+        // Evento 'input' se dispara en cada pulsación de tecla
         input.addEventListener("input", validar);
+        // Evento 'paste' detecta cuando el usuario pega texto desde el portapapeles
         input.addEventListener("paste", () => setTimeout(validar, 10));
+
+        // Validamos el estado inicial al cargar la página (por los valores predefinidos)
         validar();
       }
 
-      //Aplicamos la validación a cada campo con su regex
-      configurarValidacion(inputAsistencia, regexEnteroPosSinSigNiSeparadores);
-      configurarValidacion(inputDuracion, regexEnteroPosSinSigNiSeparadores);
-      configurarValidacion(inputAguaXPersona, regexAguaPersonaDia);
-      configurarValidacion(inputPresupuesto, regexPresupuesto);
-      configurarValidacion(inputBidones, regexEnteroPosSinSigNiSeparadores);
+      // Aplicamos la validación a cada campo de planificación con su regla correspondiente
+      configurarValidacion(inputAsistencia, regexEnteroPositivo);
+      configurarValidacion(inputDias, regexEnteroPositivo);
+      configurarValidacion(inputAguaPersona, regexAgua);
+      configurarValidacion(inputAjusteCaja, regexPresupuesto);
+      configurarValidacion(inputBidones, regexEnteroPositivo);
 
-      //Calculo de la planificación válida
-      function obtenerPlanificaciónValida() {
-        const validacionAsistencia = inputAsistencia.value.trim();
-        const validacionDuracion = inputDuracion.value.trim();
-        const validacionAgua = inputAguaXPersona.value.trim();
-        const validacionPresupueto = inputPresupuesto.value.trim();
-        const validacionBidones = inputBidones.value.trim();
+      /**
+       * Comprueba globalmente si todos los campos de planificación son válidos
+       * y retorna un objeto con sus valores convertidos a tipos numéricos listos para operar.
+       */
+      function obtenerPlanificacionValida() {
+        const valAsistencia = inputAsistencia.value.trim();
+        const valDias = inputDias.value.trim();
+        const valAgua = inputAguaPersona.value.trim();
+        const valAjuste = inputAjusteCaja.value.trim();
+        const valBidones = inputBidones.value.trim();
 
-        if(!regexEnteroPosSinSigNiSeparadores.test(validacionAsistencia) ||
-                !regexEnteroPosSinSigNiSeparadores.test(validacionDuracion) ||
-                !regexAguaPersonaDia.test(validacionAgua) ||
-                !regexPresupuesto.test(validacionPresupueto) ||
-                !regexEnteroPosSinSigNiSeparadores.test(validacionBidones)) {
+        // Si alguno falla la validación, devolvemos null
+        if (!regexEnteroPositivo.test(valAsistencia) ||
+                !regexEnteroPositivo.test(valDias) ||
+                !regexAgua.test(valAgua) ||
+                !regexPresupuesto.test(valAjuste) ||
+                !regexEnteroPositivo.test(valBidones)) {
           return null;
         }
 
         return {
-          asistencia : parseInt(validacionAsistencia, 10),
-          duracion: parseInt(validacionDuracion, 10),
-          aguaPersona: parseFloat(validacionAgua.replace(",", ".")),
-          ajuste: parseFloat(validacionPresupueto),
-          bidonesDisponibles: parseInt(validacionBidones, 10)
+          asistencia: parseInt(valAsistencia, 10),
+          dias: parseInt(valDias, 10),
+          aguaPersona: parseFloat(valAgua.replace(",", ".")), // Convertimos la coma decimal a punto para JavaScript
+          ajuste: parseFloat(valAjuste),
+          bidonesDisponibles: parseInt(valBidones, 10)
         };
       }
 
+
+      // ==========================================
+      // 3. TAREA 2: CÁLCULO Y PUBLICACIÓN DEL PLAN
+      // ==========================================
+
+      // Evento al hacer clic en "Calcular recursos"
       btnCalcularRecursos.addEventListener("click", () => {
-        const datos = obtenerPlanificaciónValida();
+        const datos = obtenerPlanificacionValida();
+
+        // Control de errores: si hay datos incorrectos o vacíos, no calculamos y avisamos
         if (!datos) {
-          alert("Por favor, corrige los campos marcados en rojo antes de calcular.");
-          outputAguaNecesaria.textContent = "Inválido";
-          outputBidonesNecesarios.textContent = "Inválido";
-          outputPresupuestoEstimado.textContent = "Inválido";
-          outputEstado.textContent = "Estado: Error en los datos";
-          outputEstado.className = "alerta";
+          alert("Error: Existen campos con formato inválido o vacíos. Revísalos antes de calcular.");
+          statusEstadoRecursos.textContent = "Estado: Error de validación en los datos";
+          statusEstadoRecursos.className = "alerta";
+          outAguaTotal.textContent = "Inválido";
+          outBidonesNecesarios.textContent = "Inválido";
+          outPresupuesto.textContent = "Inválido";
           ultimoCalculoValido = null;
           return;
         }
 
-        const aguaTotalLitros = datos.asistencia * datos.duracion * datos.aguaPersona;
-        const bidonesNecesarios = Math.ceil(aguaTotalLitros / 25);
-        const presupuestoEstimado = (datos.asistencia * datos.duracion * 12) * datos.ajuste;
+        // Cálculos matemáticos requeridos
+        const aguaTotalLitros = datos.asistencia * datos.dias * datos.aguaPersona;
+        const bidonesNecesarios = Math.ceil(aguaTotalLitros / 25); // Math.ceil redondea siempre hacia arriba
+        const presupuesto = (datos.asistencia * datos.dias * 12) + datos.ajuste;
         const cubreExistencias = datos.bidonesDisponibles >= bidonesNecesarios;
 
-        ultimoCalculoValido = { ...datos, aguaTotalLitros, bidonesNecesarios, presupuestoEstimado, cubreExistencias };
+        // Guardamos el cálculo actual en nuestra variable global temporal
+        ultimoCalculoValido = {
+          ...datos,
+          aguaTotalLitros,
+          bidonesNecesarios,
+          presupuesto,
+          cubreExistencias
+        };
 
-        outputAguaNecesaria.textContent = `${aguaTotalLitros.toFixed(2)} litros`;
-        outputBidonesNecesarios.textContent = `${bidonesNecesarios} bidones`;
-        outputPresupuestoEstimado.textContent = `${presupuestoEstimado.toFixed(2)} €`;
+        // Volcamos los resultados formateados en los elementos <output> del HTML
+        outAguaTotal.textContent = `${aguaTotalLitros.toFixed(2)} litros`;
+        outBidonesNecesarios.textContent = `${bidonesNecesarios} bidones`;
+        outPresupuesto.textContent = `${presupuesto.toFixed(2)} €`;
 
+        // Indicador visual de stock de bidones usando las clases CSS del HTML (.correcto o .alerta)
         if (cubreExistencias) {
-          outputEstado.textContent = "Estado: Stock suficiente";
-          outputEstado.className = "correcto";
+          statusEstadoRecursos.textContent = "Estado: Stock suficiente (Los bidones cubren la necesidad)";
+          statusEstadoRecursos.className = "correcto";
         } else {
-          outputEstado.textContent = "Estado: Alerta - Reponer bidones";
-          outputEstado.className = "alerta";
+          statusEstadoRecursos.textContent = "Estado: Alerta - Es necesario reponer existencias de bidones";
+          statusEstadoRecursos.className = "alerta";
         }
       });
 
+      // Evento al hacer clic en "Publicar informe"
       btnPublicarInforme.addEventListener("click", () => {
         if (!ultimoCalculoValido) {
-          alert("Primero debes calcular los recursos antes de publicar.");
+          alert("Primero debes realizar un cálculo de recursos válido antes de publicar el informe.");
           return;
         }
-        if (!confirm("¿Deseas publicar el informe del plan de recursos?")) {
-          return;
+
+        // Pedimos confirmación explícita al usuario antes de mostrar el resumen
+        const confirmado = confirm("¿Estás seguro de que deseas publicar el informe del plan de recursos?");
+        if (!confirmado) {
+          return; // Si cancela, la ejecución se detiene y no se muestra nada
         }
-        alert(`=== INFORME FESTIVAL ===\n- Agua: ${ultimoCalculoValido.aguaTotalLitros.toFixed(2)} L\n- Bidones: ${ultimoCalculoValido.bidonesNecesarios}\n- Presupuesto: ${ultimoCalculoValido.presupuestoEstimado.toFixed(2)} €`);
+
+        // Creamos el resumen formateado en texto y lo mostramos mediante alert()
+        const resumen = `=== INFORME FESTIVAL PRISMA ===\n` +
+                `- Asistencia prevista: ${ultimoCalculoValido.asistencia} personas\n` +
+                `- Duración: ${ultimoCalculoValido.dias} días\n` +
+                `- Agua total necesaria: ${ultimoCalculoValido.aguaTotalLitros.toFixed(2)} L\n` +
+                `- Bidones necesarios (25L): ${ultimoCalculoValido.bidonesNecesarios} (Disponibles: ${ultimoCalculoValido.bidonesDisponibles})\n` +
+                `- Presupuesto estimado: ${ultimoCalculoValido.presupuesto.toFixed(2)} €\n` +
+                `- Estado de recursos: ${ultimoCalculoValido.cubreExistencias ? "Suficiente" : "Reponer existencias"}`;
+
+        alert(resumen);
       });
 
-      //Registro y resumen de cursos
-      // 1. Evento para AÑADIR un turno nuevo usando el <template>
+
+      // ==========================================
+      // 4. TAREA 3: REGISTRO Y RESUMEN DE TURNOS
+      // ==========================================
+
+      // Evento al pulsar "Añadir turno"
       btnAnadirTurno.addEventListener("click", () => {
-        // Si el párrafo de "sin-turnos" está visible, lo ocultamos porque ya vamos a meter un turno
+        // Si el párrafo de aviso "sin-turnos" está visible, lo ocultamos
         if (pSinTurnos) {
           pSinTurnos.style.display = "none";
         }
 
-        // Clonamos el contenido del template (true significa clonación profunda: clona el div y sus hijos)
-        const clon = plantillaTurnos.content.cloneNode(true);
-
-        // Buscamos los elementos internos del clon recién creado
+        // Clonamos el contenido del <template> del HTML (true indica clonación profunda de todos sus hijos)
+        const clon = plantillaTurno.content.cloneNode(true);
         const btnQuitar = clon.querySelector(".quitar-turno");
         const inputHoras = clon.querySelector(".horas-turno");
 
-        // Evento para que el botón "Quitar turno" borre exclusivamente este elemento
+        // Añadimos validación en tiempo real para las horas del turno creado
+        const regexHoras = /^\d+(,\d+)?$\vert{}^\d+(\.\d+)?$/;
+        inputHoras.addEventListener("input", () => {
+          const val = inputHoras.value.trim();
+          if (regexHoras.test(val)) {
+            inputHoras.classList.add("valido");
+            inputHoras.classList.remove("invalido");
+          } else {
+            inputHoras.classList.add("invalido");
+            inputHoras.classList.remove("valido");
+          }
+        });
+
+        // Programamos el botón "Quitar turno" de este bloque específico
         btnQuitar.addEventListener("click", (e) => {
-          // e.target.closest(".turno") busca el contenedor de la fila de turno más cercano y lo elimina
+          // e.target.closest(".turno") busca la fila contenedora del turno y la elimina del DOM
           e.target.closest(".turno").remove();
 
-          // Si al borrar nos quedamos sin turnos, volvemos a mostrar el mensaje informativo original
+          // Si al eliminar nos quedamos sin turnos en la lista, volvemos a mostrar el aviso original
           if (listaTurnos.querySelectorAll(".turno").length === 0 && pSinTurnos) {
             pSinTurnos.style.display = "block";
           }
         });
 
-        // Añadimos el turno clonado al final del contenedor de la lista de turnos
+        // Insertamos el clon al final de la lista de turnos en el DOM
         listaTurnos.appendChild(clon);
       });
 
-      // 2. Evento para CALCULAR el resumen de todos los turnos existentes
-      btnCambiarResumenTurno.addEventListener("click", () => {
-        // Seleccionamos todos los elementos que tengan la clase .turno dentro de la lista
+      // Evento al pulsar "Calcular resumen de turnos"
+      btnResumirTurnos.addEventListener("click", () => {
         const itemsTurnos = listaTurnos.querySelectorAll(".turno");
 
-        // Control por si no hay ningún turno añadido
+        // Comprobación por si no hay turnos añadidos
         if (itemsTurnos.length === 0) {
-          alert("No hay turnos registrados para calcular.");
-          outputHorasTotales.textContent = "0";
-          outputMediaTurno.textContent = "0";
-          outputTurnoMas8Horas.textContent = "0";
+          alert("No hay turnos registrados en el sistema para calcular el resumen.");
+          outHorasTotales.textContent = "0";
+          outMediaTurno.textContent = "0";
+          outTurnosExtensos.textContent = "0";
           return;
         }
 
@@ -341,48 +428,93 @@
         let turnosExtensosCount = 0;
         let hayErrores = false;
 
-        // Recorremos cada fila de turno existente mediante forEach
+        // Recorremos cada elemento de turno existente mediante un bucle forEach
         itemsTurnos.forEach(turnoDiv => {
           const inputHoras = turnoDiv.querySelector(".horas-turno");
           const valorStr = inputHoras.value.trim().replace(",", ".");
 
-          // Limpiamos clases visuales previas de alerta en cada cálculo
+          // Limpiamos estilos de marcado previo en cada iteración
           turnoDiv.classList.remove("turno-extenso");
-          inputHoras.classList.remove("invalido");
 
-          // Validamos que el valor introducido sea un número válido y positivo
+          // Validamos que el valor de las horas sea numérico y positivo
           if (valorStr === "" || isNaN(valorStr) || parseFloat(valorStr) < 0) {
             hayErrores = true;
-            inputHoras.classList.add("invalido"); // Marcamos el input en rojo si es erróneo
+            inputHoras.classList.add("invalido");
           } else {
+            inputHoras.classList.remove("invalido");
             const horas = parseFloat(valorStr);
             horasTotales += horas;
             cantidadValidos++;
 
-            // Comprobamos si el turno supera las 8 horas (requisito del enunciado)
+            // Si el turno supera las 8 horas, lo contamos y aplicamos la clase visual de alerta
             if (horas > 8) {
               turnosExtensosCount++;
-              // Aplicamos la clase visual de alerta definida en el CSS del profesor (.turno-extenso)
-              turnoDiv.classList.add("turno-extenso");
+              turnoDiv.classList.add("turno-extenso"); // Marca visual exigida por el enunciado
             }
           }
         });
 
-        // Si algún turno contenía errores, avisamos y detenemos el cálculo
+        // Si hay errores de formato en algún turno, detenemos el proceso
         if (hayErrores) {
-          alert("Hay turnos con valores vacíos o incorrectos. Revísalos.");
+          alert("Hay turnos con horas vacías o valores no válidos. Corrígelos antes de calcular.");
           return;
         }
 
-        // Calculamos la media (evitando división por cero)
+        // Calculamos la media de horas (evitando división por cero)
         const mediaHoras = cantidadValidos > 0 ? (horasTotales / cantidadValidos) : 0;
 
-        // Volcamos los resultados en los elementos <output> correspondientes
-        outputHorasTotales.textContent = `${horasTotales.toFixed(2)} h`;
-        outputMediaTurno.textContent = `${mediaHoras.toFixed(2)} h`;
-        outputTurnoMas8Horas.textContent = `${turnosExtensosCount} turnos`;
+        // Mostramos los resultados en los elementos <output> correspondientes
+        outHorasTotales.textContent = `${horasTotales.toFixed(2)} h`;
+        outMediaTurno.textContent = `${mediaHoras.toFixed(2)} h`;
+        outTurnosExtensos.textContent = `${turnosExtensosCount} turnos`;
       });
 
+
+      // ==========================================
+      // 5. TAREA 4: ACTUALIZACIÓN DE LA PANTALLA PÚBLICA
+      // ==========================================
+
+      // Evento al pulsar "Actualizar pantalla pública"
+      btnActualizarPantalla.addEventListener("click", () => {
+        const mensaje = inputMensajePublico.value.trim();
+
+        // 1. Actualizamos el mensaje visible en el párrafo correspondiente
+        if (mensaje !== "") {
+          textoPublico.textContent = mensaje;
+        } else {
+          textoPublico.textContent = "(Mensaje público vacío)";
+        }
+
+        // 2. Cambiamos dinámicamente el aspecto (color de fondo y borde) de la pantalla pública
+        // en función del estado de los recursos calculado previamente.
+        if (ultimoCalculoValido) {
+          if (ultimoCalculoValido.cubreExistencias) {
+            divPantallaPublica.style.backgroundColor = "#e6f4ea"; // Tono verdoso (stock óptimo)
+            divPantallaPublica.style.borderColor = "#17633a";
+          } else {
+            divPantallaPublica.style.backgroundColor = "#fdf2f2"; // Tono rojizo (alerta de stock)
+            divPantallaPublica.style.borderColor = "#9d2525";
+          }
+        } else {
+          divPantallaPublica.style.backgroundColor = "#e8f3ff"; // Tono por defecto
+          divPantallaPublica.style.borderColor = "#d5dde5";
+        }
+
+        /**
+         * IDENTIFICACIÓN DE OBJETOS PREDEFINIDOS DEL LENGUAJE Y NAVEGADOR:
+         * - document: Objeto global que representa el DOM completo de la página web.
+         *   Se usa `document.title` para leer el título actual definido en el <head>.
+         * - window: Objeto global que representa la ventana del navegador.
+         *   Se usa `window.innerWidth` y `window.innerHeight` para obtener el ancho y alto actuales en píxeles de la ventana.
+         */
+        const tituloDocumento = document.title;
+        const anchoVentana = window.innerWidth;
+        const altoVentana = window.innerHeight;
+
+        // 3. Mostramos la información del sistema en el elemento id="datos-ventana"
+        datosVentana.innerHTML = `<strong>Página:</strong> ${tituloDocumento} | ` +
+                `<strong>Ventana:</strong> ${anchoVentana}px × ${altoVentana}px`;
+      });
     });
   </script>
 </body>
