@@ -27,41 +27,40 @@ function pintarProducto(producto, unidades) {
   lista.append(li);
 }
 
+// AMPLIACIÓN (ejercicio 3.4): esperar y conTimeout colocados antes de cargarTienda()
+const esperar = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const conTimeout = (promesa, ms) => {
-  //Creamos una promesa, la cual se rechaza cuando el tiempo haya pasado
   const timeout = esperar(ms).then(() => {
     throw new Error('Tiempo agotado');
   });
-  //Creamos una carrera para que si la promesa taremina antes que el temporizador,
-  //solo salga la promesa terminada, y se ignore el contador y viceversa 
   return Promise.race([promesa, timeout]);
 };
 
-conTimeout(tarea('Rápida', 500), 1000)
-  .then(resultado4 => console.log('Éxito: ', resultado4))
-  .catch(error => console.error('Error: ', error.message));
-
-conTimeout(tarea('Lenta', 2000), 1000)
-  .then(resultado5 => console.log('Éxito: ', resultado5))
-  .catch(error => console.error('Error: ', error.message));
+// Variable declarada fuera para guardar los productos y usarlos en el siguiente .then
+let productosGlobal = [];
 
 function cargarTienda() {
   // TODO 1: vaciar la lista, ocultar el error y mostrar «Cargando…»
   lista.innerHTML = '';
   ocultar(error);
   mostrar(cargando);
-  // TODO 2: obtener los productos
+
+  // TODO 2 & Ampliación: obtener los productos envueltos en conTimeout
+  // (puedes probar con 500 para forzar el error de tiempo agotado, o dejarlo en 2000)
   conTimeout(obtenerProductos(), 2000)
     .then(productos => {
-      // TODO 3: con Promise.all, pedir el stock de TODOS los productos a la vez
-      //         (pista: productos.map(p => obtenerStock(p.id)))
-      //         Necesitarás los productos también en el siguiente then:
-      //         piensa cómo hacérselos llegar.
-      return conTimeout(Promise.all(productos.map(p => obtenerStock(p.id).then(unidades => ({ producto: p, unidades })))), 2000);
+      productosGlobal = productos; // Guardamos los productos fuera
+
+      // TODO 3 & Ampliación: con Promise.all y conTimeout, pedir el stock de todos a la vez
+      const peticiones = productos.map(p => obtenerStock(p.id));
+      return conTimeout(Promise.all(peticiones), 2000);
     })
-    .then(resultados => {
+    .then(stocks => {
       // TODO 4: pintar cada producto con su stock usando pintarProducto
-      resultados.forEach(({ producto, unidades }) => pintarProducto(producto, unidades));
+      productosGlobal.forEach((producto, i) => {
+        pintarProducto(producto, stocks[i].unidades);
+      });
     })
     .catch(err => {
       // TODO 5: si algo falla, mostrar el mensaje en #mensajeError y el bloque #error
