@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetch y axios · Ejemplos del profesor</title>
+  <!-- axios desde CDN: hace falta para los ejemplos 15 y 16 -->
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    nav a { display: inline-block; margin: 0 .4rem .4rem 0; padding: .3rem .6rem; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #222; }
+    nav a.activo { background: #222; color: #fff; }
+    #salida { margin-top: 1rem; padding: 1rem; border: 1px dashed #bbb; min-height: 4rem; }
+    #salida:empty::before { content: 'Aquí aparece lo que pinte el ejemplo. Lo demás sale en la consola (F12).'; color: #888; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Fetch y axios</h1>
+  <p>Elige un ejemplo y abre la consola (F12). Cada ejemplo es el archivo con ese número.</p>
+  <nav id="menu"></nav>
+  <div id="salida"></div>
+
+  <script>
+    // Lanzador: carga el ejemplo que diga la URL (index.html?ej=13).
+    // Así cada ejemplo se ejecuta solo, en una página limpia.
+    const EJEMPLOS = {
+      11: '11-fetch-basico.js',
+      12: '12-formatos.js',
+      13: '13-errores-fetch.js',
+      14: '14-post.js',
+      15: '15-axios.js',
+      16: '16-axios-instancia.js'
+    };
+    const actual = new URLSearchParams(location.search).get('ej');
+    const menu = document.getElementById('menu');
+    for (const [num, archivo] of Object.entries(EJEMPLOS)) {
+      const a = document.createElement('a');
+      a.href = '?ej=' + num;
+      a.textContent = archivo;
+      if (num === actual) a.classList.add('activo');
+      menu.append(a);
+    }
+    if (EJEMPLOS[actual]) {
+      console.log('%c▶ ' + EJEMPLOS[actual], 'font-weight:bold');
+      const script = document.createElement('script');
+      script.src = EJEMPLOS[actual];
+      document.body.append(script);
+    }
+  </script>
+</body>
+</html>
